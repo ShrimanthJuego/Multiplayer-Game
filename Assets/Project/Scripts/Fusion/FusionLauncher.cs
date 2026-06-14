@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class FusionLauncher : MonoBehaviour, INetworkRunnerCallbacks
 {
     [SerializeField] private NetworkPrefabRef playerPrefab;
+    [SerializeField] private NetworkObject chatSystemPrefab;
     private NetworkRunner _runner;
 
     public async System.Threading.Tasks.Task StartHostMode()
@@ -32,7 +33,7 @@ public class FusionLauncher : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = gameMode,
             SessionName = "TestRoom",
-            //  Scene = sceneReference,
+             Scene = sceneReference,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
 
@@ -72,8 +73,10 @@ public class FusionLauncher : MonoBehaviour, INetworkRunnerCallbacks
                 Quaternion.identity,
                 player  // give InputAuthority to this player
             );
-
+            // chatSystemPrefab.AssignInputAuthority(player);
             Debug.Log($"Spawned player for: {player}");
+            
+            // runner.Spawn(chatSystemPrefab, Vector3.zero, Quaternion.identity, player);
         }
     }
 
@@ -122,7 +125,8 @@ public class FusionLauncher : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log("OnInput called");
         var inputData = new NetworkInputData
         {
-            Direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"))
+            Direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")),
+            isTakenDamage = Input.GetKey(KeyCode.Space)
         };
         input.Set(inputData);
     }
@@ -154,7 +158,7 @@ public class FusionLauncher : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        Debug.Log("throw new System.NotImplementedException");
+        Debug.Log("Scene loaded. Spawning players.");
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
